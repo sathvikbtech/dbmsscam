@@ -1,0 +1,128 @@
+CRC
+AIM 
+To write a program for implementing on a data set characters the three CRC polynomials – CRC 12, CRC16 and CRC CCIP
+
+Description:
+
+Calculation of Polynomial Code (CRC) Checksum
+1. For degree of generating polynomial G(x) = r , append r zero bits to low-order of frame. The frame now has m+r bits.
+2. Divide the bit string corresponding to G(X) into the bit string xrM(x) mod(2)
+3. Subtract the remainder R(x) from the bit string xrM(x) mod(2)
+
+Frame: 1 1 0 1 0 1 1 0 1 1
+Generator: 1 0 0 1 1
+G(X) = X4 + X + 1
+
+Message after appending four 0’s:
+1 1 0 1 0 1 1 0 1 1 0 0 0 0
+
+Remainder: 1110
+
+Transmitted Frame:
+1 1 0 1 0 1 1 0 1 1 1 1 1 0
+
+Common CRC Generator Polynomials
+
+CRC-32: 
+ x32 + x 26 + x 23 + x22 + x16 + x12 + x11 + x10 + x8 + x7 + x5 + x4 + x2 + x + 1
+Used in FDDI, Ethernet.
+
+CRC-CCITT:
+ x16 + X12 + x5 + 1
+Used in HDLC.
+
+CRC-8:
+ x8 + x2 + x + 1
+Used in ATM.
+
+PROCEDURES 
+
+Step-1: Read the frame
+Step-2: Read the generator polynomial
+Step-3: find out the degree of the generator polynomial
+Step-4: Append the number of the zero’s to the frame that number is equal to the degree of the polynomial
+Step-5: Find out number of digits in the generator polynomial
+Step-6: Repeat the following until the number of digits are exhausted
+Step-7: If the frame is starting with 1 , then exclusive-or the frame with generator
+Step-8: Check whether the result obtained in step 7 is starting with 1, If so exclusive-or the remainder with the generator
+Step-9: If the result obtained in step7 is starting with 0, then exclusive –or the remainder(result) with zeros. The number of zeroes must be equal to the length of the generator.
+
+PROGRAM FOR CYCLIC REDUNDENCY CHECK 
+
+#include<stdio.h>
+#include<conio.h>
+int gen[4],genl,frl,rem[4];
+void main()
+{
+int i,j,fr[8],dupfr[11],recfr[11],tlen,flag;
+clrscr();
+frl=8; genl=4;
+printf("enter frame:");
+for(i=0;i<frl;i++)
+{
+scanf("%d",&fr[i]);
+dupfr[i]=fr[i];
+}
+printf("enter generator:");
+for(i=0;i<genl;i++)
+scanf("%d",&gen[i]);
+tlen=frl+genl-1;
+for(i=frl;i<tlen;i++)
+{
+dupfr[i]=0;
+}
+remainder(dupfr);
+for(i=0;i<frl;i++)
+{
+recfr[i]=fr[i];
+}
+for(i=frl,j=1;j<genl;i++,j++)
+{
+recfr[i]=rem[j];
+}
+remainder(recfr);
+flag=0;
+for(i=0;i<4;i++)
+{
+if(rem[i]!=0)
+flag++;
+}
+if(flag==0)
+{
+printf("frame received correctly");
+}
+else
+{
+printf("the received frame is wrong");
+}
+getch();
+}
+remainder(int fr[])
+{
+int k,k1,i,j;
+for(k=0;k<frl;k++)
+{
+if(fr[k]==1)
+{
+k1=k;
+for(i=0,j=k;i<genl;i++,j++)
+{
+rem[i]=fr[j]^gen[i];
+}
+for(i=0;i<genl;i++)
+{
+fr[k1]=rem[i];
+k1++;
+}
+}
+}
+}
+
+INPUT:
+enter frame :
+1 1 1 1 1 1 1 1
+enter generator :
+1 1 0 1
+
+OUTPUT:
+frame received correctly
